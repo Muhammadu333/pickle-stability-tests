@@ -1,0 +1,7 @@
+__pycache__/
+*.pyc
+*.pyo
+.pytest_cache/
+.hypothesis/
+fixtures/reference_hashes.json
+fixtures/cross_platform_report.json
