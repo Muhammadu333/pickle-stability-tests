@@ -189,6 +189,11 @@ class TestBVNestingDepth:
         assert roundtrip(obj, protocol) is not None
 
     @pytest.mark.boundary
+    @pytest.mark.xfail(
+        sys.version_info >= (3, 12),
+        reason="C pickle in Python 3.12+ handles deeper nesting without hitting Python recursion limit",
+        strict=False,
+    )
     def test_depth_500_hits_recursion_limit(self, protocol):
         """
         FINDING: nesting depth of 500 exceeds the default recursion limit
@@ -206,6 +211,11 @@ class TestBVNestingDepth:
             pickle.dumps(obj, protocol=protocol)
 
     @pytest.mark.boundary
+    @pytest.mark.xfail(
+        sys.version_info >= (3, 12),
+        reason="C pickle in Python 3.12+ handles deeper nesting without hitting Python recursion limit",
+        strict=False,
+    )
     def test_recursion_limit_breach(self, protocol):
         """
         Nesting beyond sys.getrecursionlimit() should raise RecursionError or
