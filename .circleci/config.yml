@@ -1,0 +1,109 @@
+version: 2.1
+
+jobs:
+  test-linux:
+    docker:
+      - image: cimg/python:3.11
+    steps:
+      - checkout
+      - run:
+          name: Install dependencies
+          command: pip install pytest hypothesis
+      - run:
+          name: Run test suite
+          command: pytest --tb=short -q
+      - run:
+          name: Generate reference hashes (Linux)
+          command: pytest test_cross_platform.py --generate-refs -q
+      - store_artifacts:
+          path: fixtures/reference_hashes.json
+          destination: reference_hashes_linux_py311.json
+
+  test-linux-39:
+    docker:
+      - image: cimg/python:3.9
+    steps:
+      - checkout
+      - run:
+          name: Install dependencies
+          command: pip install pytest hypothesis
+      - run:
+          name: Run test suite
+          command: pytest --tb=short -q
+
+  test-linux-310:
+    docker:
+      - image: cimg/python:3.10
+    steps:
+      - checkout
+      - run:
+          name: Install dependencies
+          command: pip install pytest hypothesis
+      - run:
+          name: Run test suite
+          command: pytest --tb=short -q
+
+  test-linux-312:
+    docker:
+      - image: cimg/python:3.12
+    steps:
+      - checkout
+      - run:
+          name: Install dependencies
+          command: pip install pytest hypothesis
+      - run:
+          name: Run test suite
+          command: pytest --tb=short -q
+
+  test-macos:
+    macos:
+      xcode: "15.3.0"
+    steps:
+      - checkout
+      - run:
+          name: Install Python 3.11
+          command: brew install python@3.11 || true
+      - run:
+          name: Install dependencies
+          command: python3 -m pip install pytest hypothesis
+      - run:
+          name: Run test suite
+          command: python3 -m pytest --tb=short -q
+      - run:
+          name: Generate reference hashes (macOS)
+          command: python3 -m pytest test_cross_platform.py --generate-refs -q
+      - store_artifacts:
+          path: fixtures/reference_hashes.json
+          destination: reference_hashes_macos.json
+
+  test-windows:
+    machine:
+      image: windows-server-2022-gui:current
+      shell: powershell.exe
+    steps:
+      - checkout
+      - run:
+          name: Install Python
+          command: choco install python311 -y
+      - run:
+          name: Install dependencies
+          command: python -m pip install pytest hypothesis
+      - run:
+          name: Run test suite
+          command: python -m pytest --tb=short -q
+      - run:
+          name: Generate reference hashes (Windows)
+          command: python -m pytest test_cross_platform.py --generate-refs -q
+      - store_artifacts:
+          path: fixtures/reference_hashes.json
+          destination: reference_hashes_windows.json
+
+workflows:
+  cross-platform:
+    jobs:
+      - test-linux
+      - test-linux-39
+      - test-linux-310
+      - test-linux-312
+      - test-macos
+      - test-windows
