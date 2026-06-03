@@ -1,0 +1,9 @@
+ARG PYTHON_VERSION=3.11
+FROM python:${PYTHON_VERSION}-slim
+
+WORKDIR /suite
+COPY . .
+RUN pip install --quiet pytest hypothesis
+
+CMD ["python", "-m", "pytest", "test_instabilities.py", "test_blackbox.py", \
+     "-q", "--tb=short", "--no-header", "-p", "no:warnings"]

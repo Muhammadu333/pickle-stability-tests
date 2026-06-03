@@ -1,0 +1,50 @@
+name: Cross-Platform Pickle Stability
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+
+jobs:
+  test:
+    strategy:
+      matrix:
+        os: [ubuntu-latest, macos-latest, windows-latest]
+        python-version: ["3.9", "3.10", "3.11", "3.12"]
+
+    runs-on: ${{ matrix.os }}
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Python ${{ matrix.python-version }}
+        uses: actions/setup-python@v5
+        with:
+          python-version: ${{ matrix.python-version }}
+
+      - name: Install dependencies
+        run: pip install pytest hypothesis
+
+      - name: Generate reference hashes for this platform
+        run: |
+          cd pickle_test_suite
+          pytest test_cross_platform.py --generate-refs -q
+
+      - name: Upload reference hashes as artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: ref-hashes-${{ matrix.os }}-py${{ matrix.python-version }}
+          path: pickle_test_suite/fixtures/reference_hashes.json
+
+      - name: Run full test suite
+        run: |
+          cd pickle_test_suite
+          pytest --tb=short -q
+
+      - name: Upload test results
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: results-${{ matrix.os }}-py${{ matrix.python-version }}
+          path: pickle_test_suite/
