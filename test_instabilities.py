@@ -182,6 +182,11 @@ class TestI5RecursionInstability:
     """
 
     @pytest.mark.parametrize("protocol", ALL_PROTOCOLS, ids=lambda p: f"proto{p}")
+    @pytest.mark.xfail(
+        sys.version_info >= (3, 12),
+        reason="C pickle in Python 3.12+ handles deeper nesting without hitting Python recursion limit",
+        strict=False,
+    )
     def test_depth_500_is_unpicklable(self, protocol):
         lst = []
         cur = lst
