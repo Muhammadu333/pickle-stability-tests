@@ -79,7 +79,8 @@ jobs:
   test-windows:
     machine:
       image: windows-server-2022-gui:current
-      shell: powershell.exe
+      shell: 'powershell.exe -ExecutionPolicy Bypass'
+    resource_class: windows.medium
     steps:
       - checkout
       - run:
