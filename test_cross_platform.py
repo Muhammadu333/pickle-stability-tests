@@ -85,17 +85,9 @@ def _build_reference_table():
     return table
 
 
-def pytest_addoption(parser):
-    parser.addoption(
-        "--generate-refs",
-        action="store_true",
-        default=False,
-        help="Generate reference hash fixture for this platform.",
-    )
-
-
 @pytest.fixture(scope="session")
 def generate_refs(request):
+    # --generate-refs is registered in conftest.py
     return request.config.getoption("--generate-refs", default=False)
 
 
